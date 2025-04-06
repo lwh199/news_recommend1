@@ -3,7 +3,7 @@ import os
 import pickle
 import signal
 from random import sample
-
+from multiprocessing import Pool
 import multitasking
 import numpy as np
 import pandas as pd
@@ -148,7 +148,7 @@ def evaluate(df, total):
     return hitrate_5, mrr_5, hitrate_10, mrr_10, hitrate_20, mrr_20, hitrate_40, mrr_40, hitrate_50, mrr_50
 
 
-@multitasking.task
+# @multitasking.task
 def gen_sub_multitasking(test_users, prediction, all_articles, worker_id):
     lines = []
 
@@ -179,10 +179,10 @@ def gen_sub(prediction):
 
     all_articles = set(prediction['article_id'].values)
 
-    sub_sample = pd.read_csv('../tcdata/testB_click_log_Test_B.csv')
+    sub_sample = pd.read_csv('../tcdata/testA_click_log.csv')
     test_users = sub_sample.user_id.unique()
 
-    n_split = max_threads
+    n_split = os.cpu_count()
     total = len(test_users)
     n_len = total // n_split
 
@@ -191,11 +191,16 @@ def gen_sub(prediction):
         for file_name in file_list:
             os.remove(os.path.join(path, file_name))
 
+    pool = Pool(n_split)
     for i in range(0, total, n_len):
         part_users = test_users[i:i + n_len]
-        gen_sub_multitasking(part_users, prediction, all_articles, i)
+        # gen_sub_multitasking(part_users, prediction, all_articles, i)
+        pool.apply_async(gen_sub_multitasking,
+                         args=(part_users, prediction, all_articles, i))
+    pool.close()
+    pool.join()
 
-    multitasking.wait_for_tasks()
+    # multitasking.wait_for_tasks()
 
     lines = []
     for path, _, file_list in os.walk('../user_data/tmp/sub'):

@@ -24,7 +24,7 @@ random.seed(seed)
 
 # 命令行参数
 parser = argparse.ArgumentParser(description='w2v 召回')
-parser.add_argument('--mode', default='valid')
+parser.add_argument('--mode', default='invalid')
 parser.add_argument('--logfile', default='test.log')
 
 args = parser.parse_args()

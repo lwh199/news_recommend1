@@ -20,7 +20,7 @@ seed = 2020  # 设置随机种子
 
 # 命令行参数解析
 parser = argparse.ArgumentParser(description='排序特征')
-parser.add_argument('--mode', default='valid')  # 模式：验证或在线
+parser.add_argument('--mode', default='invalid')  # 模式：验证或在线
 parser.add_argument('--logfile', default='test.log')  # 日志文件名
 
 args = parser.parse_args()
@@ -323,8 +323,10 @@ if __name__ == '__main__':
         with open('../user_data/data/online/article_w2v.pkl', 'rb') as f:
             article_vec_map = pickle.load(f)
 
-    df_feature['user_clicked_article_w2v_sim_sum'] = df_feature[['user_id', 'article_id']].parallel_apply(lambda x: func_w2w_sum(x, 5, user_item_dict, article_vec_map), axis=1)
-    df_feature['user_last_click_article_w2v_sim'] = df_feature[['user_id', 'article_id']].parallel_apply(func_w2w_last_sim, axis=1, args=(user_item_dict, article_vec_map))
+    # df_feature['user_clicked_article_w2v_sim_sum'] = df_feature[['user_id', 'article_id']].parallel_apply(lambda x: func_w2w_sum(x, 5, user_item_dict, article_vec_map), axis=1)
+    # df_feature['user_last_click_article_w2v_sim'] = df_feature[['user_id', 'article_id']].parallel_apply(func_w2w_last_sim, axis=1, args=(user_item_dict, article_vec_map))
+    df_feature['user_clicked_article_w2v_sim_sum'] = df_feature[['user_id', 'article_id']].apply(lambda x: func_w2w_sum(x, 5, user_item_dict, article_vec_map), axis=1)
+    df_feature['user_last_click_article_w2v_sim'] = df_feature[['user_id', 'article_id']].apply(func_w2w_last_sim, axis=1, args=(user_item_dict, article_vec_map))
 
     log.debug(f'df_feature.shape: {df_feature.shape}')
     log.debug(f'df_feature.columns: {df_feature.columns.tolist()}')

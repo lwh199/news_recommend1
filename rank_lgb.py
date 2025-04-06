@@ -58,7 +58,8 @@ def train_model(df_feature, df_query):
                                reg_lambda=0.5,
                                random_state=seed,
                                importance_type='gain',
-                               metric=None)
+                               metric=None,
+                               verbose=100)
 
     oof = []
     prediction = df_test[['user_id', 'article_id']]
@@ -84,9 +85,8 @@ def train_model(df_feature, df_query):
                               Y_train,
                               eval_names=['train', 'valid'],
                               eval_set=[(X_train, Y_train), (X_val, Y_val)],
-                              verbose=100,
                               eval_metric='auc',
-                              early_stopping_rounds=100)
+                              callbacks=[lgb.early_stopping(stopping_rounds=100, verbose=100)])
 
         pred_val = lgb_model.predict_proba(
             X_val, num_iteration=lgb_model.best_iteration_)[:, 1]
@@ -163,7 +163,7 @@ def online_predict(df_test):
 
 if __name__ == '__main__':
     if mode == 'valid':
-        df_feature = pd.read_pickle('../user_data/data/offline/feature.pkl')
+        df_feature = pd.read_pickle('../user_data/data/offline/features.pkl')
         df_query = pd.read_pickle('../user_data/data/offline/query.pkl')
 
         for f in df_feature.select_dtypes('object').columns:
@@ -172,5 +172,5 @@ if __name__ == '__main__':
 
         train_model(df_feature, df_query)
     else:
-        df_feature = pd.read_pickle('../user_data/data/online/feature.pkl')
+        df_feature = pd.read_pickle('../user_data/data/online/features.pkl')
         online_predict(df_feature)

@@ -12,7 +12,8 @@ random.seed(2020)
 
 # 命令行参数
 parser = argparse.ArgumentParser(description='数据处理')
-parser.add_argument('--mode', default='valid')
+parser.add_argument('--mode', default='invalid')
+
 parser.add_argument('--logfile', default='test.log')
 
 args = parser.parse_args()

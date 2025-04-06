@@ -27,7 +27,7 @@ random.seed(2020)  # 设置随机种子以确保结果可复现
 
 # 解析命令行参数
 parser = argparse.ArgumentParser(description='召回合并')
-parser.add_argument('--mode', default='valid')  # 模式：验证或在线
+parser.add_argument('--mode', default='invalid')  # 模式：验证或在线
 parser.add_argument('--logfile', default='test.log')  # 日志文件名
 
 args = parser.parse_args()
